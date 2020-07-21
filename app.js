@@ -1,8 +1,24 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import createError from 'http-errors';
 import logger from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+
+dotenv.config();
+
+mongoose.connect(process.env.MONGO_DB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+  // we're connected!
+  console.log('connected!');
+});
 
 const app = express();
 

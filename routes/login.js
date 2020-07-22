@@ -1,6 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 const router = express.Router();
 
@@ -33,6 +34,31 @@ router.post('/', function (req, res, next) {
       res.json({ user: token });
     });
   })(req, res, next);
+});
+
+router.get('/', function (req, res, next) {
+  let decoded;
+  try {
+    decoded = jwt.verify(req.cookies.JWT, process.env.JWT_SECRET);
+  } catch (error) {
+    res.status(404);
+    res.json({
+      message: 'Invalid',
+    });
+  }
+
+  console.log(decoded);
+
+  User.findById(decoded.user._id, (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+      expiresIn: '15m',
+    });
+
+    res.json({ user: token });
+  });
 });
 
 export default router;

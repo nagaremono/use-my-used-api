@@ -5,6 +5,9 @@ import logger from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
+import login from './routes/login.js';
+import './auth/passport.js';
+import passport from 'passport';
 
 dotenv.config();
 
@@ -27,10 +30,13 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(passport.initialize());
 
 app.get('/', (req, res) => {
   res.send('Hello world!');
 });
+
+app.use('/login', login);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

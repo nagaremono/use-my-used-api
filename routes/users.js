@@ -54,4 +54,16 @@ router.post(
   }
 );
 
+router.get('/:id', (req, res, next) => {
+  User.findById(req.params.id)
+    .populate('items')
+    .exec((err, user) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.json(user);
+    });
+});
+
 export default router;

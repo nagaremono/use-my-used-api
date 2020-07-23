@@ -42,6 +42,7 @@ router.post(
       let newUser = new User({
         username: req.body.username,
         password: hashedPassword,
+        isAdmin: req.body.key === process.env.ADMIN_KEY,
       });
 
       newUser.save((err, user) => {
@@ -95,7 +96,7 @@ router.put(
     }
 
     // Current user can only update their own account
-    if (req.user._id != req.params.id) {
+    if (req.user._id != req.params.id && req.user.isAdmin === false) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
@@ -131,7 +132,7 @@ router.delete(
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     // Current user can only delete their own account
-    if (req.user._id != req.params.id) {
+    if (req.user._id != req.params.id && req.user.isAdmin === false) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 

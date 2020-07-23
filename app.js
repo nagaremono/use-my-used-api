@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import login from './routes/login.js';
 import './auth/passport.js';
-import userRoute from './routes/user.js';
+import userRoute from './routes/users.js';
 import passport from 'passport';
 
 dotenv.config();
@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/login', login);
-app.use('/user', userRoute);
+app.use('/users', userRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

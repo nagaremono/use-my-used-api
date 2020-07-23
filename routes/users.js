@@ -4,7 +4,8 @@ import User from '../models/User.js';
 import expressValidator from 'express-validator';
 
 const router = express.Router();
-const { body, validationResult } = expressValidator;
+const body = expressValidator.body;
+const validationResult = expressValidator.validationResult;
 
 router.post(
   '/',
@@ -17,6 +18,13 @@ router.post(
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters'),
+    body('confirmpassword').custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords does not match');
+      }
+
+      return true;
+    }),
   ],
   (req, res, next) => {
     const errors = validationResult(req);

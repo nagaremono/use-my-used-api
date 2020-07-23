@@ -2,10 +2,16 @@ import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import expressValidator from 'express-validator';
 
 const router = express.Router();
+const body = expressValidator.body;
 
-router.post('/', function (req, res, next) {
+router.post('/', [body('*').trim(), body('*').escape()], function (
+  req,
+  res,
+  next
+) {
   passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err) {
       return next(err);

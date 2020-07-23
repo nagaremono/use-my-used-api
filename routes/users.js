@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import expressValidator from 'express-validator';
-import passport from 'passport';
+import authorizePutAndDelete from '../auth/authPutAndDelete.js';
 
 const router = express.Router();
 const body = expressValidator.body;
@@ -70,7 +70,7 @@ router.get('/:id', (req, res, next) => {
 
 router.put(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  authorizePutAndDelete,
   [
     body('*').trim(),
     body('*').escape(),
@@ -93,11 +93,6 @@ router.put(
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
-    }
-
-    // Current user can only update their own account
-    if (req.user._id != req.params.id && req.user.isAdmin === false) {
-      return res.status(401).json({ message: 'Unauthorized' });
     }
 
     bcrypt
@@ -127,23 +122,14 @@ router.put(
   }
 );
 
-router.delete(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  (req, res, next) => {
-    // Current user can only delete their own account
-    if (req.user._id != req.params.id && req.user.isAdmin === false) {
-      return res.status(401).json({ message: 'Unauthorized' });
+router.delete('/:id', authorizePutAndDelete, (req, res, next) => {
+  User.findByIdAndDelete(req.params.id, (err, user) => {
+    if (err) {
+      return next(err);
     }
 
-    User.findByIdAndDelete(req.params.id, (err, user) => {
-      if (err) {
-        return next(err);
-      }
-
-      return res.json({ user, message: 'Deleted' });
-    });
-  }
-);
+    return res.json({ user, message: 'Deleted' });
+  });
+});
 
 export default router;

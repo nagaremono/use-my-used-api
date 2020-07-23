@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const PictureSchema = new Schema({
-  image: { data: Buffer, contentType: String },
+  image: { type: String },
   user: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 

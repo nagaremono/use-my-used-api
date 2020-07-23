@@ -25,6 +25,8 @@ router.post('/', function (req, res, next) {
         expiresIn: '14d',
       });
 
+      res.clearCookie('JWT', { path: '/login' });
+
       res.cookie('JWT', refreshToken, {
         httpOnly: true,
         expires: new Date(Date.now() + 14 * 864e5), // 2 weeks

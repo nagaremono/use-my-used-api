@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import login from './routes/login.js';
 import './auth/passport.js';
 import userRoute from './routes/users.js';
+import pictureRoute from './routes/pictures.js';
 import passport from 'passport';
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.get('/', (req, res) => {
 
 app.use('/login', login);
 app.use('/users', userRoute);
+app.use('/pictures', pictureRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

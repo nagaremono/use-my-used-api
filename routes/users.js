@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import expressValidator from 'express-validator';
+import passport from 'passport';
 
 const router = express.Router();
 const body = expressValidator.body;
@@ -68,6 +69,7 @@ router.get('/:id', (req, res, next) => {
 
 router.put(
   '/:id',
+  passport.authenticate('jwt', { session: false }),
   [
     body('*').trim(),
     body('*').escape(),
@@ -92,11 +94,16 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    // Current user can only update their own account
+    if (req.user._id != req.params.id) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
     bcrypt
       .hash(req.body.password, 10)
       .then((hashedPassword) => {
         User.findByIdAndUpdate(
-          req.params.id,
+          req.user._id,
           {
             username: req.body.username,
             password: hashedPassword,

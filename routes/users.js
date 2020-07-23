@@ -103,7 +103,7 @@ router.put(
       .hash(req.body.password, 10)
       .then((hashedPassword) => {
         User.findByIdAndUpdate(
-          req.user._id,
+          req.params.id,
           {
             username: req.body.username,
             password: hashedPassword,
@@ -123,6 +123,25 @@ router.put(
       .catch((err) => {
         return next(err);
       });
+  }
+);
+
+router.delete(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    // Current user can only delete their own account
+    if (req.user._id != req.params.id) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    User.findByIdAndDelete(req.params.id, (err, user) => {
+      if (err) {
+        return next(err);
+      }
+
+      return res.json({ user, message: 'Deleted' });
+    });
   }
 );
 

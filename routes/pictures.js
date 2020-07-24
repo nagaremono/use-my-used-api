@@ -4,6 +4,7 @@ import Picture from '../models/Picture.js';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import fs from 'fs';
+import authorizePutAndDelete from '../auth/picturePutAndDelete.js';
 
 const router = express.Router();
 const upload = multer({
@@ -46,14 +47,10 @@ router.post(
 
 router.put(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  authorizePutAndDelete,
   upload.single('picture'),
   async function (req, res, next) {
     const picture = await Picture.findById(req.params.id);
-
-    if (req.user._id != picture.user.toString()) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
 
     picture.image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
@@ -69,24 +66,14 @@ router.put(
   }
 );
 
-router.delete(
-  '/:id',
-  passport.authenticate('jwt', { session: false }),
-  async function (req, res, next) {
-    const picture = await Picture.findById(req.params.id);
-
-    if (req.user._id != picture.user.toString()) {
-      return res.status(401).json({ message: 'Unauthorized' });
+router.delete('/:id', authorizePutAndDelete, async function (req, res, next) {
+  Picture.findByIdAndDelete(req.params.id, (err, user) => {
+    if (err) {
+      return next(err);
     }
 
-    Picture.findByIdAndDelete(req.params.id, (err, user) => {
-      if (err) {
-        return next(err);
-      }
-
-      res.json(user);
-    });
-  }
-);
+    res.json(user);
+  });
+});
 
 export default router;

@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import expressValidator from 'express-validator';
-import authorizePutAndDelete from '../auth/authPutAndDelete.js';
+import authorizePutAndDelete from '../auth/usersPutAndDelete.js';
 
 const router = express.Router();
 const body = expressValidator.body;

@@ -69,4 +69,24 @@ router.put(
   }
 );
 
+router.delete(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res, next) {
+    const picture = await Picture.findById(req.params.id);
+
+    if (req.user._id != picture.user.toString()) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    Picture.findByIdAndDelete(req.params.id, (err, user) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.json(user);
+    });
+  }
+);
+
 export default router;

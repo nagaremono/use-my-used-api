@@ -22,7 +22,18 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.get('/:id');
+router.get('/:id', (req, res, next) => {
+  Item.findById(req.params.id)
+    .populate('seller')
+    .populate('picture')
+    .exec((err, pictures) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.json(pictures);
+    });
+});
 
 router.post('/');
 

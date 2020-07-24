@@ -10,7 +10,7 @@ export default function (req, res, next) {
         message: info.message,
       });
     }
-    console.log(user);
+
     if (user._id != req.params.id && user.isAdmin === false) {
       return res.status(401).json({ message: 'Unauthorized' });
     }

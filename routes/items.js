@@ -113,4 +113,17 @@ router.put(
   }
 );
 
+router.delete('/:id', authorizePutAndDelete, async function (req, res, next) {
+  try {
+    const deletedItem = await Item.findByIdAndDelete(req.params.id).exec();
+    const User = await User.findById(req.user._id);
+    User.items = User.items.filter((item) => item !== deletedItem.id);
+    await User.save();
+
+    res.json(deletedItem);
+  } catch (error) {
+    return next(error);
+  }
+});
+
 export default router;

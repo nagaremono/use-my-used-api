@@ -24,6 +24,7 @@ const ItemSchema = new Schema({
   picture: { type: Schema.Types.ObjectId, required: true, ref: 'Picture' },
   seller: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
   posted: { type: Date, default: moment() },
+  isAvailable: { type: Boolean, default: true },
 });
 
 ItemSchema.virtual('formattedDate').get(function () {

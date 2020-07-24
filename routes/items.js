@@ -104,6 +104,7 @@ router.put(
         quantity: req.body.quantity,
         picture: req.body.pictureid,
         seller: req.user._id,
+        isAvailable: req.body.isavailable,
       }).exec();
 
       res.json(savedItem);

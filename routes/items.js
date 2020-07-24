@@ -5,6 +5,7 @@ import Item from '../models/Item.js';
 import Picture from '../models/Picture.js';
 import expressValidator from 'express-validator';
 import passport from 'passport';
+import authorizePutAndDelete from '../auth/itemsPutAndDelete.js';
 
 const router = express.Router();
 const body = expressValidator.body;
@@ -74,8 +75,42 @@ router.post(
   }
 );
 
-router.put('/:id');
+router.put(
+  '/:id',
+  authorizePutAndDelete,
+  [
+    body(['name', 'description', 'price', 'category', 'quantity'])
+      .trim()
+      .escape(),
+    body(['name', 'description', 'price', 'category', 'quantity']).isLength({
+      min: 1,
+    }),
+  ],
+  async function (req, res, next) {
+    const errors = validationResult(req);
 
-router.delete('/:id');
+    if (!errors.isEmpty) {
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+    }
+
+    try {
+      const savedItem = await Item.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        description: req.body.name,
+        price: req.body.price,
+        category: req.body.category,
+        quantity: req.body.quantity,
+        picture: req.body.pictureid,
+        seller: req.user._id,
+      }).exec();
+
+      res.json(savedItem);
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
 
 export default router;

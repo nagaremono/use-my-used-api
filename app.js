@@ -9,6 +9,7 @@ import login from './routes/login.js';
 import './auth/passport.js';
 import userRoute from './routes/users.js';
 import pictureRoute from './routes/pictures.js';
+import messageRoute from './routes/messages.js';
 import itemRoute from './routes/items.js';
 import passport from 'passport';
 
@@ -44,6 +45,7 @@ app.use('/login', login);
 app.use('/users', userRoute);
 app.use('/pictures', pictureRoute);
 app.use('/items', itemRoute);
+app.use('/messages/', messageRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -30,7 +30,7 @@ db.once('open', function () {
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -63,6 +63,6 @@ app.use(function (err, req, res) {
   res.json();
 });
 
-app.listen(3000, () => {
-  console.log('Now listening on port 3000');
+app.listen(4000, () => {
+  console.log('Now listening on port 4000');
 });

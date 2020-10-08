@@ -39,7 +39,15 @@ router.post('/', [body('*').trim(), body('*').escape()], function (
         path: '/login',
       });
 
-      res.json({ user: token });
+      console.log(user);
+
+      res.json({
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+        },
+      });
     });
   })(req, res, next);
 });
@@ -50,7 +58,7 @@ router.get('/', function (req, res, next) {
     decoded = jwt.verify(req.cookies.JWT, process.env.JWT_SECRET);
   } catch (error) {
     res.status(404);
-    res.json({
+    return res.json({
       message: 'Invalid',
     });
   }
@@ -65,7 +73,13 @@ router.get('/', function (req, res, next) {
       expiresIn: '15m',
     });
 
-    res.json({ user: token });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+      },
+    });
   });
 });
 

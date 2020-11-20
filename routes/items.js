@@ -45,10 +45,8 @@ router.post(
   async function (req, res, next) {
     const errors = validationResult(req);
 
-    if (!errors.isEmpty) {
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
     let newItem = new Item({
@@ -89,10 +87,8 @@ router.put(
   async function (req, res, next) {
     const errors = validationResult(req);
 
-    if (!errors.isEmpty) {
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
     try {

@@ -11,24 +11,24 @@ const router = express.Router();
 const body = expressValidator.body;
 const validationResult = expressValidator.validationResult;
 
-router.get('/', (req, res, next) => {
-  Item.find().exec((err, pictures) => {
-    if (err) {
-      return next(err);
-    }
+router.get('/', async (req, res, next) => {
+  try {
+    const items = await Item.find().exec();
 
-    res.json(pictures);
-  });
+    res.json(items);
+  } catch (error) {
+    return next(error);
+  }
 });
 
-router.get('/:id', (req, res, next) => {
-  Item.findById(req.params.id).exec((err, pictures) => {
-    if (err) {
-      return next(err);
-    }
+router.get('/:id', async (req, res, next) => {
+  try {
+    const item = await Item.findById(req.params.id).exec();
 
-    res.json(pictures);
-  });
+    res.json(item);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 router.post(

@@ -33,7 +33,6 @@ router.post(
   },
   body('*').trim().escape(),
   async function (req, res, next) {
-    console.log(req.user._id);
     try {
       const receiver = await User.findById(req.body.receiver).exec();
       const sender = await User.findById(req.user._id).exec();

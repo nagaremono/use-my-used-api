@@ -12,36 +12,36 @@ const upload = multer({
   limits: { fileSize: 2e6, files: 1 },
 });
 
-router.get('/:id', (req, res) => {
-  Picture.findById(req.params.id, (err, picture) => {
-    if (err) {
-      res.status(404);
-      res.json({ message: 'Not Found' });
-    }
+router.get('/:id', async (req, res) => {
+  try {
+    const picture = await Picture.findById(req.params.id);
 
     res.json(picture);
-  });
+  } catch (error) {
+    res.status(404);
+    res.json({ messsage: 'Not Found' });
+  }
 });
 
 router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   upload.single('picture'),
-  (req, res, next) => {
+  async (req, res, next) => {
     let newPicture = new Picture({
       image: fs.readFileSync(req.file.path, { encoding: 'base64' }),
       user: mongoose.Types.ObjectId(req.user._id),
     });
 
-    newPicture.save((err, picture) => {
-      if (err) {
-        return next(err);
-      }
+    try {
+      const picture = await newPicture.save();
 
       fs.unlinkSync(req.file.path);
 
       res.json(picture);
-    });
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 
@@ -50,30 +50,30 @@ router.put(
   authorizePutAndDelete,
   upload.single('picture'),
   async function (req, res, next) {
-    const picture = await Picture.findById(req.params.id);
+    try {
+      const picture = await Picture.findById(req.params.id);
 
-    picture.image = fs.readFileSync(req.file.path, { encoding: 'base64' });
+      picture.image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
-    picture.save((err, picture) => {
-      if (err) {
-        return next(err);
-      }
+      const updatedPicture = await picture.save();
 
       fs.unlinkSync(req.file.path);
 
-      res.json(picture);
-    });
+      res.json(updatedPicture);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 
 router.delete('/:id', authorizePutAndDelete, async function (req, res, next) {
-  Picture.findByIdAndDelete(req.params.id, (err, user) => {
-    if (err) {
-      return next(err);
-    }
+  try {
+    const picture = await Picture.findByIdAndDelete().exec();
 
-    res.json(user);
-  });
+    res.json(picture);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 export default router;

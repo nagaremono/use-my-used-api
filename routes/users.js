@@ -29,45 +29,37 @@ router.post(
       return true;
     }),
   ],
-  (req, res, next) => {
+  async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-      if (err) {
-        return next(err);
-      }
+    try {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-      let newUser = new User({
+      const newUser = new User({
         username: req.body.username,
         password: hashedPassword,
         isAdmin: req.body.key === process.env.ADMIN_KEY,
-      });
+      }).save();
 
-      newUser.save((err, user) => {
-        if (err) {
-          return next(err);
-        }
-
-        res.json(user);
-      });
-    });
+      res.json(newUser);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 
-router.get('/:id', (req, res, next) => {
-  User.findById(req.params.id)
-    .populate('items')
-    .exec((err, user) => {
-      if (err) {
-        return next(err);
-      }
+router.get('/:id', async (req, res, next) => {
+  try {
+    const user = await User.findById().populate('items').exec();
 
-      res.json(user);
-    });
+    res.json(user);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 router.put(
@@ -90,48 +82,40 @@ router.put(
       return true;
     }),
   ],
-  (req, res, next) => {
+  async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    bcrypt
-      .hash(req.body.password, 10)
-      .then((hashedPassword) => {
-        User.findByIdAndUpdate(
-          req.params.id,
-          {
-            username: req.body.username,
-            password: hashedPassword,
-          },
-          {
-            new: true,
-          },
-          (err, updatedUser) => {
-            if (err) {
-              return next(err);
-            }
+    try {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-            res.json(updatedUser);
-          }
-        );
-      })
-      .catch((err) => {
-        return next(err);
-      });
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          username: req.body.username,
+          password: hashedPassword,
+        },
+        { new: true }
+      ).exec();
+
+      res.json(updatedUser);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 
-router.delete('/:id', authorizePutAndDelete, (req, res, next) => {
-  User.findByIdAndDelete(req.params.id, (err, user) => {
-    if (err) {
-      return next(err);
-    }
+router.delete('/:id', authorizePutAndDelete, async (req, res, next) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id).exec();
 
-    return res.json({ user, message: 'Deleted' });
-  });
+    res.json({ user: deletedUser, message: 'Deleted' });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 export default router;

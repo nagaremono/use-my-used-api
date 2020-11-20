@@ -39,8 +39,6 @@ router.post('/', [body('*').trim(), body('*').escape()], function (
         path: '/login',
       });
 
-      console.log(user);
-
       res.json({
         token,
         user: {
@@ -52,7 +50,7 @@ router.post('/', [body('*').trim(), body('*').escape()], function (
   })(req, res, next);
 });
 
-router.get('/', function (req, res, next) {
+router.get('/', async (req, res, next) => {
   let decoded;
   try {
     decoded = jwt.verify(req.cookies.JWT, process.env.JWT_SECRET);
@@ -63,12 +61,9 @@ router.get('/', function (req, res, next) {
     });
   }
 
-  console.log(decoded);
+  try {
+    const user = await User.findById(decoded.user._id).exec();
 
-  User.findById(decoded.user._id, (err, user) => {
-    if (err) {
-      return next(err);
-    }
     const token = jwt.sign({ user }, process.env.JWT_SECRET, {
       expiresIn: '15m',
     });
@@ -80,7 +75,9 @@ router.get('/', function (req, res, next) {
         username: user.username,
       },
     });
-  });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 export default router;

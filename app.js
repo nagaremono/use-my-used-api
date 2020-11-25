@@ -15,18 +15,23 @@ import passport from 'passport';
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_DB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
+mongoose
+  .connect(process.env.MONGO_DB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(() => {
+    console.log('connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
 const db = mongoose.connection;
+
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-  // we're connected!
-  console.log('connected!');
-});
 
 const app = express();
 
